@@ -1,2 +1,5 @@
 asyncio
 aiohttp
+uuid
+secrets
+colorama
