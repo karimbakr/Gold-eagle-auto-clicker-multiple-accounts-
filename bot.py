@@ -6,16 +6,30 @@ import uuid
 import secrets
 from datetime import datetime
 from colorama import Fore, Style, init
+import random
 
 # Initialize colorama
 init(autoreset=True)
 
 count = int(input("Your energy: "))
-PAUSE_DURATION = 7 * 60  # مدة التوقف بالثواني (10 دقائق)
+PAUSE_DURATION = 7 * 60
+PAUSE = 2 * 60   # مدة التوقف بالثواني (10 دقائق)
 TOTAL_LIMIT = 1000  # الحد الأقصى لمجموع الأرقام العشوائية قبل التوقف لكل توكن
 
 # قاموس لتتبع المجموع لكل توكن
 token_counts = {}
+EDGE_USERAGENTS = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.2365.57",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.2365.52",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.2365.46",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36 Edg/121.0.2277.128",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36 Edg/121.0.2277.112",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36 Edg/121.0.2277.98",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36 Edg/121.0.2277.83",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.2210.133",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.2210.121",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.2210.91"
+]
 
 def get_current_timestamp():
     """Retrieve the current timestamp."""
@@ -43,9 +57,10 @@ def print_response(acc_number, user_id, coins_amount, counts, total):
 async def send_request(token, acc_number):
     """Send an asynchronous HTTP POST request for a specific token."""
     global token_counts  # استخدم القاموس لتتبع مجموع كل توكن
+    random_user_agent = random.choice(EDGE_USERAGENTS)
     url = "https://api-gw.geagle.online/tap"
     headers = {
-        'User-Agent': "Mozilla/5.0 (Linux; Android 12; K) Telegram-Android/11.2.3 (Nubia NX669J; Android 12; SDK 32; HIGH)",
+        'User-Agent': random_user_agent,
         'Accept': "application/json, text/plain, */*",
         'Accept-Encoding': "gzip, deflate, br, zstd",
         'Content-Type': "application/json",
@@ -72,7 +87,8 @@ async def send_request(token, acc_number):
                 "available_taps": count,
                 "count": counts,
                 "timestamp": get_current_timestamp(),
-                "salt": f"{salt}"
+                "salt": f"{salt}",
+                "unique_id": str(uuid.uuid4())  # معرف مميز لكل طلب
             }
 
             try:
@@ -98,7 +114,16 @@ async def send_request(token, acc_number):
                 await asyncio.sleep(5)
                 continue
 
-            random_delay = secrets.randbelow(11) + 15  # رقم عشوائي بين 10 و 15
+            if token_counts[acc_number] % 10 == 0:  # غير الـ User-Agent بعد كل 10 طلبات
+                random_user_agent = random.choice(EDGE_USERAGENTS)
+                headers['User-Agent'] = random_user_agent
+
+            if token_counts[acc_number] % 50 == 0:  # التوقف بعد كل 50 طلب
+                print(f"{Fore.YELLOW}Taking a longer pause for token anti detect 👾👽{acc_number}...")
+                await asyncio.sleep(PAUSE * 2)
+
+            random_delay = secrets.randbelow(11) + 15  # رقم عشوائي بين 20 و 40
+            #additional_delay = secrets.randbelow(1)  # تأخير إضافي عشوائي بين 0 و 5 ثوانٍ
             await asyncio.sleep(random_delay)
 
 async def main():
