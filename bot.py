@@ -15,7 +15,7 @@ welcome_message = f"""
 {Fore.YELLOW + Style.BRIGHT}
 ##########################################
 #                                        #
-#   Welcome Gold Eagle Script            #
+#   Welcome Gold Eagle Script v2           #
 #                                        #
 ##########################################
 {Fore.CYAN + Style.BRIGHT}
