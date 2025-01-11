@@ -10,8 +10,22 @@ import random
 
 # Initialize colorama
 init(autoreset=True)
+# Welcome message
+welcome_message = f"""
+{Fore.YELLOW + Style.BRIGHT}
+##########################################
+#                                        #
+#   Welcome Gold Eagle Script            #
+#                                        #
+##########################################
+{Fore.CYAN + Style.BRIGHT}
+#   Developed by: Karim                  #
+#   Telegram: {Fore.LIGHTBLUE_EX}https://t.me/YOU742         #
+##########################################
+"""
 
-count = int(input("Your energy: "))
+print(welcome_message)
+count = int(input(f"{Fore.GREEN}Your energy: {Fore.RESET}"))
 PAUSE_DURATION = 10 * 60
 PAUSE = 2 * 60   # مدة التوقف بالثواني (10 دقائق)
 TOTAL_LIMIT = 1000  # الحد الأقصى لمجموع الأرقام العشوائية قبل التوقف لكل توكن
