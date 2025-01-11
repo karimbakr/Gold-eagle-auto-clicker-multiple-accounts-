@@ -12,7 +12,7 @@ import random
 init(autoreset=True)
 
 count = int(input("Your energy: "))
-PAUSE_DURATION = 7 * 60
+PAUSE_DURATION = 10 * 60
 PAUSE = 2 * 60   # مدة التوقف بالثواني (10 دقائق)
 TOTAL_LIMIT = 1000  # الحد الأقصى لمجموع الأرقام العشوائية قبل التوقف لكل توكن
 
@@ -58,15 +58,16 @@ async def send_request(token, acc_number):
     """Send an asynchronous HTTP POST request for a specific token."""
     global token_counts  # استخدم القاموس لتتبع مجموع كل توكن
     random_user_agent = random.choice(EDGE_USERAGENTS)
-    url = "https://api-gw.geagle.online/tap"
+    url = "https://gold-eagle-api.fly.dev/tap"
     headers = {
-        'User-Agent': random_user_agent,
-        'Accept': "application/json, text/plain, */*",
-        'Accept-Encoding': "gzip, deflate, br, zstd",
-        'Content-Type': "application/json",
-        'authorization': f"Bearer {token}",
-        'origin': "https://telegram.geagle.online",
-        'accept-language': "en,en-US;q=0.9",
+  'User-Agent': random_user_agent,
+  'Accept': "application/json, text/plain, */*",
+  'Content-Type': "application/json",
+  'authorization': f"Bearer {token}",
+  'sec-ch-ua-platform': "\"Android\"",
+  'origin': "https://telegram.geagle.online",  
+  'referer': "https://telegram.geagle.online/",
+  'accept-language': "en-US,en;q=0.9"
     }
 
     # تعيين المجموع الأولي للتوكن إذا لم يكن موجودًا
